@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masuk — GenRPM</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{--green:#2f6b4f;--bg:#f3f7f4;--muted:#5d6b64}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1f2a24;
+       background:radial-gradient(ellipse at top,#fff 0%,var(--bg) 70%);display:flex;flex-direction:column;align-items:center;padding:24px 16px}
+  .banner{width:min(720px,94vw);height:auto;display:block}
+  .box{width:min(380px,94vw);background:#fff;border:1px solid #dfe7e2;border-radius:14px;padding:24px 22px;margin-top:10px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+  h1{font-size:1.2rem;margin:0 0 4px;color:var(--green)}
+  p.sub{margin:0 0 16px;color:var(--muted);font-size:.92rem}
+  label{display:block;font-weight:600;font-size:.9rem;margin:12px 0 4px}
+  input{width:100%;padding:10px 12px;border:1px solid #c9d6ce;border-radius:8px;font-size:1rem}
+  input:focus{outline:2px solid #9cc7b1;border-color:var(--green)}
+  .pw{position:relative}
+  .pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:4px 6px}
+  button[type=submit]{width:100%;margin-top:18px;padding:11px;border:0;border-radius:8px;background:var(--green);color:#fff;font-size:1rem;font-weight:700;cursor:pointer}
+  button[type=submit]:hover{filter:brightness(1.1)}
+  button[disabled]{opacity:.7;cursor:wait}
+  .msg{border-radius:8px;padding:9px 12px;font-size:.9rem;margin-bottom:12px}
+  .err{background:#fdecec;color:#9b1c1c;border:1px solid #f5c2c2}
+  .ok{background:#eaf5ee;color:var(--green);border:1px solid #c4e1cf}
+  footer{margin-top:18px;color:var(--muted);font-size:.8rem;text-align:center}
+</style>
+</head>
+<body>
+  <img src="assets/logo-genrpm.png" alt="GEN-RPM — Sekolah Pendidikan Khusus" class="banner">
+  <form class="box" method="post" action="/api/login" id="f">
+    <h1>Masuk ke GenRPM</h1>
+    <p class="sub">Generator Rencana Pembelajaran Mendalam untuk Sekolah Pendidikan Khusus.</p>
+    <div id="m"></div>
+    <input type="hidden" name="next" id="next" value="/">
+    <label for="u">Nama pengguna</label>
+    <input id="u" name="username" autocomplete="username" autocapitalize="none" required autofocus>
+    <label for="p">Kata sandi</label>
+    <div class="pw">
+      <input id="p" name="password" type="password" autocomplete="current-password" required>
+      <button type="button" id="t" aria-label="Tampilkan kata sandi">Lihat</button>
+    </div>
+    <button type="submit" id="go">Masuk</button>
+  </form>
+  <footer>Akses terbatas untuk pengguna terdaftar.</footer>
+<script>
+  const q = new URLSearchParams(location.search);
+  const n = q.get("next"); if (n && n.startsWith("/") && !n.startsWith("//")) document.getElementById("next").value = n;
+  const m = document.getElementById("m");
+  if (q.get("e")) m.innerHTML = '<div class="msg err">Nama pengguna atau kata sandi salah.</div>';
+  else if (q.get("out")) m.innerHTML = '<div class="msg ok">Anda sudah keluar. Isian formulir tetap tersimpan di perangkat ini.</div>';
+  document.getElementById("t").onclick = (e) => {
+    const p = document.getElementById("p"); const show = p.type === "password";
+    p.type = show ? "text" : "password"; e.target.textContent = show ? "Sembunyikan" : "Lihat";
+  };
+  document.getElementById("f").onsubmit = () => { const b = document.getElementById("go"); b.disabled = true; b.textContent = "Memeriksa…"; };
+</script>
+</body>
+</html>

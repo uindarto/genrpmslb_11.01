@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GenRPM — Generator Rencana Pembelajaran Mendalam (SLB)</title>
+  <meta name="description" content="Generator Rencana Pembelajaran Mendalam (RPM) untuk Sekolah Pendidikan Khusus.">
+  <link rel="icon" type="image/png" href="assets/logo-genrpm.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="hero">
+  <div id="userBar" class="userbar" hidden><span>Masuk sebagai <b id="userName"></b></span> <a href="/api/logout" class="btn-out">Keluar</a></div>
+  <img src="assets/logo-genrpm.png" alt="GEN-RPM — Sekolah Pendidikan Khusus" class="hero-logo">
+  <p class="hero-sub">Generator Rencana Pembelajaran Mendalam berbasis kurikulum yang berlaku — isi manual, draf otomatis, atau dengan bantuan internet.</p>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ 1. IDENTITAS ============ -->
+  <section class="card" id="sec-identitas">
+    <h2>1. Identitas &amp; Pilihan</h2>
+    <div class="grid2">
+      <label>Tahun Ajaran<select id="tahun"></select></label>
+      <label>Mata Pelajaran<select id="mapel"></select></label>
+      <label>Fase<select id="fase"></select></label>
+      <label>Kelas<select id="kelas"></select></label>
+    </div>
+    <label>Ketunaan (kebutuhan khusus peserta didik)<select id="ketunaan"></select></label>
+    <div class="grid2">
+      <label>Nama Guru<input id="guru" type="text" autocomplete="name"></label>
+      <label>Nama Kepala Sekolah<input id="kepsek" type="text"></label>
+      <label>NIP Guru (opsional)<input id="nipGuru" type="text"></label>
+      <label>NIP Kepala Sekolah (opsional)<input id="nipKepsek" type="text"></label>
+    </div>
+    <label><span id="materiLabel">Materi</span>
+      <input id="materi" type="text" list="materiList" placeholder="Pilih dari daftar materi buku, atau ketik sendiri">
+      <datalist id="materiList"></datalist>
+    </label>
+    <label>Materi Esensial (terisi otomatis saat memilih materi; boleh diedit)
+      <textarea id="materiEsensial" rows="3" placeholder="Konsep/keterampilan inti yang wajib dikuasai"></textarea>
+    </label>
+    <div class="grid2">
+      <label>Alokasi Waktu<input id="alokasi" type="text" placeholder="mis. 3 JP x 2 pertemuan (@40 menit)"></label>
+      <label>Tempat &amp; Tanggal Pengesahan (opsional)<input id="tempatTanggal" type="text" placeholder="mis. Malang, 23 November 2026"></label>
+    </div>
+    <label>Kaitan Lintas Mata Pelajaran (opsional)<input id="lintas" type="text" placeholder="mis. Geografi (siklus air dan cuaca)"></label>
+    <label>Nama Murid (satu baris satu murid; dipakai pada rubrik observasi)
+      <textarea id="murid" rows="3" placeholder="Pieter&#10;Syifa"></textarea>
+    </label>
+    <div class="grid2">
+      <label>Nama Sekolah (opsional)<input id="sekolah" type="text"></label>
+    </div>
+  </section>
+
+  <!-- ============ 2. BUKU ============ -->
+  <section class="card" id="sec-buku">
+    <h2>2. Buku Referensi (centang untuk dipakai)</h2>
+    <div class="row-btn">
+      <button type="button" class="btn" id="bukuSemua">Pilih semua</button>
+      <button type="button" class="btn" id="bukuKosong">Kosongkan</button>
+    </div>
+    <div id="bukuList" class="book-list"></div>
+    <div class="row-btn">
+      <button type="button" class="btn" id="cariBuku">Cari rujukan dari buku</button>
+      <label class="btn file-btn">Tambah buku (PDF/MD)
+        <input type="file" id="unggahBuku" accept="application/pdf,.md,.txt" multiple hidden>
+      </label>
+    </div>
+    <p class="hint" id="bukuStatus"></p>
+    <div id="bukuHasil" class="search-results"></div>
+  </section>
+
+  <!-- ============ 3. TEMPLATE ============ -->
+  <section class="card" id="sec-template">
+    <h2>3. Template Dokumen</h2>
+    <div class="radio-row">
+      <label class="inline"><input type="radio" name="tplMode" value="default" checked> Template bawaan (RPM)</label>
+      <label class="inline"><input type="radio" name="tplMode" value="custom"> Template saya (unggah RPP/RPM)</label>
+    </div>
+    <p class="hint" id="tplInfo">Memakai template Anda: Identifikasi (Profil Murid, 8 Dimensi Profil Lulusan), Desain Pembelajaran, Pengalaman Belajar (Memahami, Mengaplikasi, Merefleksi), dan Asesmen Pembelajaran.</p>
+    <div id="tplCustom" class="tpl-custom" hidden>
+      <label class="btn file-btn">Unggah template (.docx, .txt, .md)
+        <input type="file" id="tplFile" accept=".docx,.txt,.md,text/plain" hidden>
+      </label>
+      <p class="hint">Komponen &amp; sub-komponen dibaca dari tabel atau judul di dokumen Anda. Struktur di bawah boleh diedit:
+        <code># Komponen Utama</code> lalu <code>- Sub-komponen</code>. Tambahkan <code>= kunci</code> untuk memaksa kolom isi
+        (kunci: profil, materi, dpl, cp, lintas, tp, praktik, kemitraan, lingkungan, digital, pengalaman, asesmen, sumber).
+        Sub-komponen yang tidak dikenali otomatis menjadi kolom isi tambahan di bagian 4.</p>
+      <textarea id="tplText" rows="12" spellcheck="false"></textarea>
+      <div class="row-btn">
+        <button type="button" class="btn" id="tplTerapkan">Terapkan struktur</button>
+        <button type="button" class="btn" id="tplReset">Kembalikan ke bawaan</button>
+      </div>
+      <p class="hint" id="tplStatus"></p>
+    </div>
+  </section>
+
+  <!-- ============ 4. ISI DOKUMEN ============ -->
+  <section class="card" id="sec-isi">
+    <h2>4. Isi Dokumen (bisa diketik manual)</h2>
+    <p class="hint">Satu baris = satu butir. Format khusus: <code>## Judul</code> subjudul tebal, <code>- teks</code> butir,
+      <code>-- teks</code> sub-butir, <code>Label: isi</code> label tebal, <code>| a | b |</code> baris tabel (pisahkan baris dalam sel dengan <code>//</code>).
+      Isi sendiri, tekan <b>Draf Otomatis</b> untuk kerangka dasar dari panduan, atau <b>Isi dari Internet</b> (butuh koneksi) untuk draf yang dilengkapi rujukan daring.
+      Jika kolom isi masih kosong saat <b>Buat Dokumen</b> ditekan, kolom diisi otomatis.</p>
+
+    <div class="panel">
+      <h3>Capaian &amp; Tujuan Pembelajaran (CP &amp; TP)</h3>
+      <div class="radio-row">
+        <label class="inline"><input type="radio" name="cpMode" value="buku" checked> Pilih dari buku</label>
+        <label class="inline"><input type="radio" name="cpMode" value="manual"> Isi manual</label>
+      </div>
+      <p class="hint" id="cpInfo"></p>
+      <div id="cpList"></div>
+    </div>
+
+    <p class="label-like">Dimensi Profil Lulusan</p>
+    <div id="dplList" class="chips"></div>
+
+    <div class="panel isi-opsi">
+      <h3>Cara mengisi kolom di bawah</h3>
+      <p class="hint">Pilih salah satu, atau ketik sendiri. Kolom yang sudah terisi akan ditanyakan dulu sebelum ditimpa.</p>
+      <div class="row-btn">
+        <button type="button" class="btn" id="btnDraf">Draf Otomatis</button>
+        <button type="button" class="btn" id="btnInternet">Isi dari Internet</button>
+      </div>
+      <p class="hint status" id="statusIsi"></p>
+    </div>
+
+    <div id="fieldArea"></div>
+
+    <div id="customWrap" hidden>
+      <h3 class="sub">Komponen tambahan dari template</h3>
+      <div id="customArea"></div>
+    </div>
+
+    <label>Sumber Belajar / Rujukan (opsional)
+      <textarea id="f_sumber" rows="5" data-key="sumber"></textarea>
+    </label>
+
+    <label class="inline small"><input type="checkbox" id="autoClear" checked> Kosongkan formulir setelah dokumen dibuat (identitas guru &amp; sekolah tetap disimpan)</label>
+
+    <div class="row-btn">
+      <button type="button" class="btn primary" id="btnBuat">Buat Dokumen</button>
+      <button type="button" class="btn" id="btnKosong">Kosongkan Formulir</button>
+    </div>
+    <p class="hint status" id="statusForm"></p>
+  </section>
+
+  <!-- ============ HASIL ============ -->
+  <section id="hasil" hidden>
+    <div class="row-btn sticky-actions">
+      <button type="button" class="btn" id="btnDocx">Unduh Word (.docx)</button>
+      <button type="button" class="btn" id="btnCopy">Salin untuk Word</button>
+      <button type="button" class="btn" id="btnPrint">Cetak / PDF</button>
+      <span class="hint status" id="statusHasil"></span>
+    </div>
+    <article id="docPreview" class="doc"></article>
+  </section>
+
+</main>
+
+<footer class="foot">GenRPM · Generator Rencana Pembelajaran Mendalam untuk Sekolah Pendidikan Khusus · Data tersimpan hanya di peramban Anda.</footer>
+
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/docx-preview.min.js"></script>
+<script>window.docxPreview = window.docx;</script>
+<script src="vendor/docx.umd.js"></script>
+<script src="vendor/mammoth.browser.min.js"></script>
+<script src="vendor/pdf.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/data-panduan.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

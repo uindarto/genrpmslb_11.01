@@ -1,0 +1,19 @@
+[build]
+  publish = "."
+  command = ""
+
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Login (aktif jika variabel GENRPM_USERS diisi)
+[[edge_functions]]
+  path = "/*"
+  function = "auth"
